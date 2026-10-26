@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>PRATINJAU | WebGIS Nugal</title><meta name="description" content="Peta interaktif titik PLTA, lubang tambang, dan kasus korban tambang beserta sumbernya."><meta property="og:type" content="website"><meta property="og:locale" content="id_ID"><meta property="og:title" content="PRATINJAU | WebGIS Nugal"><meta property="og:description" content="Peta interaktif titik PLTA, lubang tambang, dan kasus korban tambang beserta sumbernya."><meta name="theme-color" content="#07151f"><link rel="icon" type="image/png" href="assets/logo-takar-emblem.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><style>
+:root{--bg:#07151f;--panel:#0c1e2b;--line:#244053;--text:#edf6f5;--muted:#a4b6c1;--green:#52e598;--blue:#2387ff;--orange:#ff9448;--red:#ff525f}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;overflow:hidden}button,input,select{font:inherit}button{color:inherit}.topbar{height:76px;background:#fff;color:#10202b;display:flex;align-items:center;padding:0 26px;gap:36px;position:relative;z-index:2000}.brand{display:flex;align-items:center;gap:10px;min-width:220px}.brand-mark{width:48px;height:48px;object-fit:contain;flex:none}.brand strong{font:800 19px/18px Manrope}.brand small{display:block;font-size:10px;color:#52616c}.nav{display:flex;gap:26px;align-self:stretch;align-items:center}.nav button{background:transparent;border:0;font-weight:700;cursor:default;padding:27px 0}.nav .active{border-bottom:3px solid #16a96e}.search{margin-left:auto;width:min(345px,28vw);position:relative}.search i{position:absolute;left:14px;top:12px}.search input{width:100%;border:1px solid #a9b5c1;border-radius:12px;padding:11px 14px 11px 38px;color:#233544}.support{border:0;background:#087c5e;border-radius:8px;padding:12px 16px;font-weight:700;color:#fff}.app{height:calc(100vh - 76px);padding:12px;display:grid;grid-template-columns:290px minmax(400px,1fr) 390px;gap:12px;background:radial-gradient(circle at 55% 0,#143c3f55,transparent 38%),var(--bg)}.panel{background:linear-gradient(145deg,#0d2231,#091a27);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px #0003}.filter{padding:18px;overflow:auto}.section-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}.section-head h2{margin:0;font:800 18px Manrope}.reset{background:0;border:0;color:var(--muted);font-size:12px}.filter h3{font-size:14px;margin:20px 0 10px}.check-row{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:13px}.check-row input{accent-color:var(--green);width:18px;height:18px}.icon-dot{width:26px;height:26px;display:grid;place-items:center;border-radius:7px}.plta{background:#147ff0}.void{background:#d96c2c}.victim{background:#d83d4c}.filter select{width:100%;padding:11px;border-radius:8px;border:1px solid #3a5668;background:#102838;color:var(--text)}.range-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}input[type=range]{width:100%;accent-color:var(--green)}.apply{width:100%;background:var(--green);border:0;border-radius:7px;padding:13px;color:#052416;font-weight:800;margin-top:20px}.map-area{position:relative;min-width:0}.map{height:100%;border-radius:10px;overflow:hidden}.stats{position:absolute;top:12px;left:12px;right:12px;z-index:500;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;pointer-events:none}.stat{padding:11px 12px;background:#0b1c2be8;border:1px solid #355062;border-radius:8px;display:flex;gap:10px;align-items:center;backdrop-filter:blur(5px)}.stat i{font-size:27px}.stat strong{display:block;font:800 21px/22px Manrope}.stat span{display:block;font-size:11px;color:#c5d1d8}.legend{position:absolute;bottom:15px;left:15px;z-index:500;padding:13px;width:208px;font-size:12px}.legend h3{margin:0 0 9px;font:700 14px Manrope}.legend div{margin:8px 0;display:flex;gap:8px;align-items:center}.legend b{width:12px;height:12px;border-radius:50%;display:inline-block}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#102838;color:var(--text)}.leaflet-popup-content{margin:13px}.leaflet-control-layers{background:#102838;color:var(--text);border-color:#365466}.marker{width:33px;height:33px;border-radius:50%;display:grid;place-items:center;color:#fff;border:2px solid #fff;box-shadow:0 3px 12px #0008}.detail{overflow:auto;padding:14px}.detail-empty{height:100%;display:grid;place-content:center;text-align:center;color:var(--muted);gap:12px}.detail-empty i{font-size:42px;color:var(--green)}.detail-head{display:flex;gap:10px;align-items:flex-start}.detail-head .icon-dot{width:42px;height:42px;font-size:20px}.detail h1{font:800 20px/24px Manrope;margin:0}.sub{color:var(--muted);font-size:13px;margin:4px 0 13px}.photo{width:100%;height:205px;object-fit:cover;background:#17313f;border-radius:8px;border:1px solid #355062}.no-photo{height:120px;display:grid;place-items:center;color:var(--muted);background:#102838;border:1px dashed #426378;border-radius:8px}.badge{display:inline-block;border-radius:99px;padding:5px 9px;font-size:11px;font-weight:700;margin-bottom:10px}.badge.plta{background:#147ff033}.badge.void{background:#ff944833}.badge.victim{background:#ff525f33}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 0}.info{padding:10px;background:#102838;border:1px solid #294557;border-radius:7px;font-size:12px}.info label{color:var(--muted);display:block;margin-bottom:5px}.story{line-height:1.6;font-size:14px;color:#d6e0e3}.source{display:block;margin-top:14px;padding:10px;background:#103a35;color:#7af1b1;text-decoration:none;border-radius:7px;font-size:13px;font-weight:700}.notice{position:absolute;z-index:600;top:94px;left:12px;right:12px;background:#fff3cd;color:#5c4600;padding:9px 12px;border-radius:7px;font-size:12px;display:none}.notice.show{display:block}.table-sheet{position:absolute;z-index:600;left:12px;right:12px;bottom:12px;max-height:170px;padding:10px;overflow:auto}.table-sheet h3{font:700 13px Manrope;margin:0 0 8px}.data-row{display:flex;align-items:center;gap:8px;padding:7px;border-top:1px solid #294557;font-size:12px;cursor:pointer}.data-row:hover{background:#173143}.data-row i{width:20px;text-align:center}.data-row span{margin-left:auto;color:var(--muted);font-size:11px}@media(max-width:1180px){.app{grid-template-columns:250px 1fr 330px}.nav{gap:15px}.topbar{gap:15px}}@media(max-width:900px){body{overflow:auto}.topbar{padding:0 14px;height:62px}.brand{min-width:0}.brand small,.nav,.support{display:none}.search{width:auto}.app{height:auto;min-height:calc(100vh - 62px);grid-template-columns:1fr;padding:8px}.filter{display:none}.map-area{height:70vh}.detail{min-height:350px}.stats{grid-template-columns:repeat(3,1fr)}.stat{padding:7px}.stat i{font-size:18px}.stat strong{font-size:16px}.table-sheet{display:none}}
+
+.legend{bottom:200px}.story{white-space:pre-line}.data-row{width:100%;text-align:left;background:transparent;border:0;border-top:1px solid #294557;color:inherit}.data-row:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--green);outline-offset:2px}.clear-filters{position:absolute;top:145px;left:12px;z-index:650;background:#fff;color:#173143;border:1px solid #355062;border-radius:6px;padding:8px}.clear-filters[hidden]{display:none}
+@media(max-width:900px){.filter{display:block}.table-sheet{display:block;position:relative;left:auto;right:auto;bottom:auto;max-height:220px;margin-top:8px}.map-area{height:auto}.map{height:65vh;min-height:340px}.legend{bottom:240px}.app{grid-template-columns:minmax(0,1fr)}.search{min-width:0;flex:1}.brand strong{font-size:15px}.topbar{gap:10px}.filter{max-height:360px}.detail{min-height:180px}.legend{position:relative;bottom:auto;left:auto;width:auto;margin-top:8px}.stats{gap:4px}.stat{min-width:0}.stat span{font-size:10px}.stat i{display:none}}
+.stats{right:56px}.stat-total{font-size:10px;color:var(--muted)}.detail{scroll-margin-top:12px}
+@media(max-width:900px){.map-area{display:flex;flex-direction:column}.stats{position:static;order:-1;flex:none;margin-bottom:8px}.stat{padding:9px 7px}.stat strong{line-height:22px}.detail:focus{outline:3px solid var(--green);outline-offset:2px}}
+.home{height:calc(100vh - 76px);overflow:auto;padding:0 26px 40px;background:radial-gradient(circle at 75% 0,#143c3f77,transparent 48%),var(--bg)}.home-inner{max-width:1040px;margin:0 auto}.hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:44px;align-items:center;padding:56px 0 40px}.profile-card{position:relative;padding:26px;border-radius:16px;background:linear-gradient(160deg,#0f2a3b,#0a1b27);border:1px solid #2c4b5e;box-shadow:0 18px 40px #0005;overflow:hidden}.profile-card:before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),#2387ff)}.profile-head{display:flex;align-items:center;gap:16px;margin-bottom:16px}.profile-badge{flex:none;width:76px;height:76px;border-radius:50%;background:#f4efe3;display:grid;place-items:center;box-shadow:0 0 0 4px #52e5981f}.profile-badge img{width:60px;height:60px;object-fit:contain}.profile-head strong{display:block;font:800 20px/24px Manrope}.profile-head small{display:block;color:var(--muted);font-size:12px;margin-top:2px}.profile-card p{margin:0;font-size:15px;line-height:1.7;color:#c5d1d8}.profile-note{margin-top:14px;display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#d9c77c}.eyebrow{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:14px}.home h1{font:800 clamp(28px,4.4vw,46px)/1.12 Manrope;margin:0 0 16px;max-width:680px;position:relative}.home h1 em{font-style:normal;color:var(--green)}.home .lead{font-size:18px;line-height:1.55;color:#c5d1d8;max-width:520px;margin:0 0 28px;position:relative}.cta{display:inline-flex;gap:10px;align-items:center;background:var(--green);color:#052416;border:0;border-radius:8px;padding:14px 24px;font-weight:800;font-size:15px;cursor:pointer;position:relative}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{display:grid;gap:8px;text-align:left;padding:20px;border-radius:12px;background:#0b1c2be8;border:1px solid var(--line);cursor:pointer}.card:hover{border-color:#3f6a82;background:#0e2434}.card-top{display:flex;align-items:center;gap:12px}.card-top .icon-dot{width:38px;height:38px;font-size:17px}.card-top b{font:700 15px Manrope}.card strong{display:block;font:800 38px/42px Manrope;margin-top:4px}.card strong small{font:500 14px "DM Sans";color:var(--muted);margin-left:6px}.card-desc{font-size:14px;line-height:1.5;color:#b5c4cc}.more{font-size:13px;font-weight:700;color:var(--green)}.home-note{font-size:12px;color:var(--muted);margin:12px 0 0}.info-row{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:44px;padding-top:28px;border-top:1px solid var(--line)}.info-row h2{font:700 15px Manrope;margin:0 0 6px}.info-row p{margin:0;font-size:14px;line-height:1.6;color:#aebdc5}.brand{color:inherit;text-decoration:none}.nav button:disabled{opacity:.45;cursor:not-allowed}.nav button:not(:disabled){cursor:pointer}body.view-home .app,body.view-method .app{display:none}body:not(.view-home) #home{display:none}body:not(.view-method) #method{display:none}.method-body{max-width:760px}.method-body section{padding:22px 0;border-top:1px solid var(--line)}.method-body h2{font:800 18px Manrope;margin:0 0 8px}.method-body p,.method-body li{font-size:15px;line-height:1.7;color:#c5d1d8}.method-body ul{margin:8px 0 0;padding-left:20px}.method-back{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap}.ghost{background:0;border:1px solid #3f6a82;color:var(--text);border-radius:8px;padding:12px 20px;font-weight:700;cursor:pointer}.more-link{background:0;border:0;color:var(--green);font-weight:700;font-size:13px;padding:0;margin-top:8px;cursor:pointer}@media(max-width:900px){.home{height:auto;min-height:calc(100vh - 62px);padding:0 14px 32px}.hero{grid-template-columns:1fr;gap:28px;padding:32px 0 24px}.profile-card{padding:20px}.cards,.info-row{grid-template-columns:1fr}.info-row{gap:18px}.card strong{font-size:32px}}
+.demo-flag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#3b2c00;background:#ffd666;border-radius:4px;padding:3px 7px}.demo-banner{display:flex;gap:10px;align-items:center;margin:34px 0 0;padding:10px 14px;border:1px dashed #b89a3e;border-radius:8px;background:#2a2410;color:#f3df9b;font-size:13px}.sec-head{display:flex;justify-content:space-between;align-items:center;margin:30px 0 14px}.sec-head h2{font:800 20px Manrope;margin:0;display:flex;gap:10px;align-items:center}.sec-head button{background:0;border:0;color:var(--green);font-weight:700;font-size:13px;cursor:pointer}.stories{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.story-card{border-radius:12px;overflow:hidden;background:#0b1c2be8;border:1px solid var(--line)}.ph{height:150px;display:grid;place-items:center;color:#ffffffb0;font-size:12px;gap:4px;align-content:center;text-align:center;background:repeating-linear-gradient(135deg,#ffffff0a 0 10px,transparent 10px 20px),var(--ph)}.ph i{font-size:30px}.ph-plta{--ph:linear-gradient(135deg,#0f4c8a,#123a5c)}.ph-void{--ph:linear-gradient(135deg,#8a4a1c,#4f2f1a)}.ph-victim{--ph:linear-gradient(135deg,#8a2a35,#4a1f2a)}.story-body{padding:14px 16px 16px;display:grid;gap:8px}.tag{justify-self:start;font-size:11px;font-weight:800;border-radius:99px;padding:3px 9px}.tag.plta{background:#147ff033;color:#8cc2ff}.tag.void{background:#ff944833;color:#ffc79b}.tag.victim{background:#ff525f33;color:#ffa0a8}.story-body h3{font:700 16px/1.3 Manrope;margin:0}.story-body p{margin:0;font-size:13px;line-height:1.5;color:#aebdc5}.meta{font-size:12px;color:var(--muted)}.recent{border:1px solid var(--line);border-radius:12px;background:#0b1c2be8;overflow:hidden}.recent-row{display:grid;grid-template-columns:28px 1fr auto auto;gap:14px;align-items:center;padding:12px 16px;border-top:1px solid #1d3647;font-size:14px}.recent-row:first-child{border-top:0}.recent-row span{color:var(--muted);font-size:12px}@media(max-width:900px){.stories{grid-template-columns:1fr}.recent-row{grid-template-columns:36px 1fr;gap:2px 12px}.recent-row .icon-dot{grid-row:span 3;align-self:start}.recent-row b,.recent-row>span:not(.icon-dot){grid-column:2}}
+.draft-banner{background:#fef3c7;color:#713f12;border-bottom:1px solid #f59e0b;padding:8px 16px;text-align:center;font-weight:800;font-size:13px;line-height:17px;position:relative;z-index:2500}@media(min-width:901px){.app,.home{height:calc(100vh - 110px)}}
+</style></head><body><div class="draft-banner" role="status">PRATINJAU - Titik adalah data simulasi dan bagian berlabel Contoh adalah konten fiktif, bukan data atau kasus nyata.</div><noscript><div style="padding:14px 18px;background:#fff3cd;color:#5c4600;font:14px sans-serif">Situs ini membutuhkan JavaScript untuk menampilkan peta dan data. Aktifkan JavaScript lalu muat ulang halaman.</div></noscript>
+<header class="topbar"><a class="brand" href="#/beranda" aria-label="TAKAR KALTIM, ke Beranda"><img class="brand-mark" src="assets/logo-takar-emblem.png" alt="Logo TAKAR" width="48" height="48"><div><strong>TAKAR KALTIM</strong><small>Tim Advokasi untuk Keselamatan Rakyat</small></div></a><nav class="nav" aria-label="Navigasi utama"><button data-view="home" data-go="home" class="active">Beranda</button><button data-view="map" data-go="map">Peta</button><button disabled title="Segera hadir">Cerita</button><button disabled title="Segera hadir">Data</button><button data-view="method" data-go="method">Metodologi</button></nav><label class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="search" aria-label="Cari titik" placeholder="Cari lokasi, isu, atau kata kunci..."></label><button class="support" hidden><i class="fa-regular fa-heart"></i> Dukung Advokasi</button></header>
+<section id="home" class="home" aria-label="Beranda"><div class="home-inner">
+<div class="hero"><div class="hero-text"><span class="eyebrow">Peta advokasi</span>
+<h1>Peta <em>dampak</em> PLTA, lubang tambang, dan kasus korban tambang</h1>
+<p class="lead">Lihat lokasi titik dampak, baca ceritanya, dan periksa sumbernya.</p>
+<button class="cta" data-go="map">Jelajahi peta <i class="fa-solid fa-arrow-right"></i></button></div>
+<aside class="profile-card" data-demo aria-label="Profil TAKAR KALTIM"><div class="profile-head"><span class="profile-badge"><img src="assets/logo-takar-emblem.png" alt="" width="60" height="60"></span><div><strong>TAKAR KALTIM</strong><small>Tim Advokasi untuk Keselamatan Rakyat</small></div></div><p>TAKAR KALTIM adalah tim yang bekerja bersama masyarakat terdampak proyek energi dan pertambangan. Melalui peta ini kami mengumpulkan titik dampak beserta sumbernya, agar dapat diperiksa dan dipakai oleh warga, jurnalis, peneliti, dan pembuat kebijakan.</p><div class="profile-note"><span class="demo-flag">Contoh</span><span>Teks profil contoh. Akan diganti dengan teks resmi lembaga.</span></div></aside></div>
+<div class="cards" aria-live="polite">
+<button type="button" class="card" data-focus="plta"><span class="card-top"><span class="icon-dot plta"><i class="fa-solid fa-water"></i></span><b>PLTA</b></span><strong><span id="home-plta">–</span><small>titik</small></strong><span class="card-desc">Lokasi pembangkit listrik tenaga air.</span><span class="more">Lihat di peta <i class="fa-solid fa-arrow-right"></i></span></button>
+<button type="button" class="card" data-focus="void"><span class="card-top"><span class="icon-dot void"><i class="fa-solid fa-helmet-safety"></i></span><b>Lubang tambang</b></span><strong><span id="home-void">–</span><small>titik</small></strong><span class="card-desc">Lokasi lubang tambang yang dilaporkan.</span><span class="more">Lihat di peta <i class="fa-solid fa-arrow-right"></i></span></button>
+<button type="button" class="card" data-focus="victim"><span class="card-top"><span class="icon-dot victim"><i class="fa-solid fa-person"></i></span><b>Kasus korban</b></span><strong><span id="home-victim">–</span><small>kasus</small></strong><span class="card-desc">Catatan kasus korban tambang dan kronologinya.</span><span class="more">Lihat di peta <i class="fa-solid fa-arrow-right"></i></span></button>
+</div>
+<p class="home-note" id="home-note"></p>
+<div id="home-demo" hidden>
+<div class="demo-banner"><span class="demo-flag">Contoh</span><span>Pratinjau tampilan: angka, cerita, gambar, dan daftar di bagian ini adalah <b>contoh fiktif</b>, bukan data atau kasus nyata.</span></div>
+<div class="sec-head"><h2>Cerita pilihan <span class="demo-flag">Contoh</span></h2><button type="button" disabled title="Segera hadir">Lihat semua cerita</button></div>
+<div class="stories">
+<article class="story-card"><div class="ph ph-plta" role="img" aria-label="Gambar contoh"><i class="fa-solid fa-image"></i>Gambar contoh</div><div class="story-body"><span class="tag plta">PLTA</span><h3>Judul cerita contoh pertama</h3><p>Teks contoh untuk pratinjau tata letak. Isi sebenarnya ditulis dari sumber yang dapat diperiksa.</p><span class="meta">Tanggal contoh · Lokasi contoh A</span></div></article>
+<article class="story-card"><div class="ph ph-void" role="img" aria-label="Gambar contoh"><i class="fa-solid fa-image"></i>Gambar contoh</div><div class="story-body"><span class="tag void">TAMBANG</span><h3>Judul cerita contoh kedua</h3><p>Teks contoh untuk pratinjau tata letak. Isi sebenarnya ditulis dari sumber yang dapat diperiksa.</p><span class="meta">Tanggal contoh · Lokasi contoh B</span></div></article>
+<article class="story-card"><div class="ph ph-victim" role="img" aria-label="Gambar contoh"><i class="fa-solid fa-image"></i>Gambar contoh</div><div class="story-body"><span class="tag victim">KORBAN</span><h3>Judul cerita contoh ketiga</h3><p>Teks contoh untuk pratinjau tata letak. Isi sebenarnya ditulis dari sumber yang dapat diperiksa.</p><span class="meta">Tanggal contoh · Lokasi contoh C</span></div></article>
+</div>
+<div class="sec-head"><h2>Titik terbaru <span class="demo-flag">Contoh</span></h2><button type="button" data-go="map">Lihat semua di peta <i class="fa-solid fa-arrow-right"></i></button></div>
+<div class="recent">
+<div class="recent-row"><span class="icon-dot plta"><i class="fa-solid fa-water"></i></span><b>Titik contoh PLTA 1</b><span>Lokasi contoh A</span><span>Tanggal contoh</span></div>
+<div class="recent-row"><span class="icon-dot void"><i class="fa-solid fa-helmet-safety"></i></span><b>Titik contoh lubang tambang 2</b><span>Lokasi contoh B</span><span>Tanggal contoh</span></div>
+<div class="recent-row"><span class="icon-dot victim"><i class="fa-solid fa-person"></i></span><b>Kasus contoh 3</b><span>Lokasi contoh C</span><span>Tanggal contoh</span></div>
+<div class="recent-row"><span class="icon-dot void"><i class="fa-solid fa-helmet-safety"></i></span><b>Titik contoh lubang tambang 4</b><span>Lokasi contoh D</span><span>Tanggal contoh</span></div>
+</div>
+</div>
+<div class="info-row"><div><h2>Sumber data</h2><p>Data dikelola lembaga. Hanya bagian yang sudah diperiksa yang tampil di peta.</p></div><div><h2>Periksa sumbernya</h2><p>Titik menampilkan tautan sumber bila tersedia. Tautan bukan bukti otomatis; baca sumbernya.</p></div><div><h2>Batas data</h2><p>Titik lubang tambang bukan batas konsesi, satu kasus bukan satu orang, dan radius korban hanya ilustrasi.</p><button class="more-link" data-go="method">Selengkapnya di Metodologi <i class="fa-solid fa-arrow-right"></i></button></div></div>
+</div></section>
+<section id="method" class="home" aria-label="Metodologi"><div class="home-inner">
+<div class="hero" style="display:block;padding:44px 0 8px"><span class="eyebrow">Metodologi</span><h1>Cara membaca peta ini</h1><p class="lead">Penjelasan singkat tentang asal data, arti titik, dan batas yang perlu diketahui sebelum memakai informasi di peta.</p></div>
+<div class="method-body">
+<section><h2>Asal data</h2><p>Data dikelola lembaga dalam sebuah daftar bersama. Daftar kerja internal tidak diterbitkan. Hanya bagian yang sudah melalui pemeriksaan lembaga yang diterbitkan, dan hanya bagian itu yang dibaca peta ini setiap kali halaman dimuat.</p></section>
+<section><h2>Pemeriksaan sebelum tayang</h2><p>Menurut aturan kerja lembaga, sebuah titik baru dianggap siap tayang bila lokasinya jelas dan sumbernya tercantum, dan titik yang menyebut individu atau perusahaan tertentu harus bersumber. Ini aturan kerja, bukan pemeriksaan otomatis oleh peta; peta tidak memeriksa kebenaran isi sumber.</p></section>
+<section><h2>Arti titik di peta</h2><ul><li><b>PLTA:</b> satu titik mewakili satu lokasi pembangkit listrik tenaga air.</li><li><b>Lubang tambang:</b> satu titik mewakili satu lokasi pelaporan. Titik bukan batas atau luas konsesi.</li><li><b>Kasus korban:</b> satu titik adalah satu catatan kasus, bukan jumlah orang. Satu kasus dapat menyangkut lebih dari satu orang.</li></ul></section>
+<section><h2>Lingkaran di sekitar titik korban</h2><p>Lingkaran adalah radius ilustratif untuk membantu membaca sekitar lokasi. Lingkaran bukan batas regulasi, bukan zona dampak yang terbukti, dan bukan hasil analisis.</p></section>
+<section><h2>Sumber dan tautan</h2><p>Setiap titik menampilkan tautan sumber bila tersedia. Adanya tautan tidak otomatis membuktikan isi klaim; baca sumbernya sendiri. Tautan keluar membuka situs lain yang tidak dikelola lembaga dan isinya dapat berubah atau hilang.</p></section>
+<section><h2>Lokasi</h2><p>Koordinat memakai derajat desimal (WGS84) dan dapat berupa perkiraan lokasi. Jangan memakai titik di peta sebagai batas hukum atau ukuran jarak yang pasti.</p></section>
+<section><h2>Pembaruan dan kelengkapan</h2><p>Data diambil setiap halaman dimuat. Perubahan di daftar lembaga bisa tertunda sebelum terlihat di peta. Peta hanya memuat yang sudah dikumpulkan dan diperiksa, sehingga tidak mewakili seluruh kejadian.</p></section>
+<section><h2>Lisensi data</h2><p>Lisensi pemakaian data belum ditetapkan. Hingga ada keterangan resmi, hubungi lembaga sebelum menyalin atau menerbitkan ulang data dari peta ini.</p></section>
+</div>
+<div class="method-back"><button class="cta" data-go="map">Lihat peta <i class="fa-solid fa-arrow-right"></i></button><button class="ghost" data-go="home">Kembali ke Beranda</button></div>
+</div></section>
+<main class="app"><aside class="panel filter"><div class="section-head"><h2>Filter Peta</h2><button class="reset" id="reset">Reset <i class="fa-solid fa-rotate-left"></i></button></div><h3>Pilih Isu Utama</h3><label class="check-row"><input type="checkbox" data-category="plta" checked><span class="icon-dot plta"><i class="fa-solid fa-water"></i></span>PLTA <b id="count-plta"></b></label><label class="check-row"><input type="checkbox" data-category="void" checked><span class="icon-dot void"><i class="fa-solid fa-helmet-safety"></i></span>Lubang Tambang <b id="count-void"></b></label><label class="check-row"><input type="checkbox" data-category="victim" checked><span class="icon-dot victim"><i class="fa-solid fa-person"></i></span>Korban <b id="count-victim"></b></label><h3>Lokasi dari data</h3><select id="location" aria-label="Lokasi"><option value="">Semua lokasi</option></select><h3>Tahun kejadian</h3><input id="year" aria-label="Sampai tahun" type="range" min="2000" max="2026" value="2026"><div class="range-label"><span id="year-min">2000</span><span id="year-value">Sampai 2026</span></div><p id="unknown-years" class="sub" aria-live="polite"></p><button class="apply" id="apply"><i class="fa-solid fa-filter"></i> Terapkan Filter</button></aside><section class="map-area"><div id="map" class="panel map"></div><div id="notice" class="notice" role="status" aria-live="polite"></div><button id="clear-filters" class="clear-filters" hidden>Hapus filter</button><div class="stats"><div class="stat"><i class="fa-solid fa-water" style="color:var(--blue)"></i><div><strong id="stat-plta">0</strong><span>Titik PLTA</span><span class="stat-total" id="total-plta">dari 0 total</span></div></div><div class="stat"><i class="fa-solid fa-helmet-safety" style="color:var(--orange)"></i><div><strong id="stat-void">0</strong><span>Lubang tambang</span><span class="stat-total" id="total-void">dari 0 total</span></div></div><div class="stat"><i class="fa-solid fa-person" style="color:var(--red)"></i><div><strong id="stat-victim">0</strong><span>Kasus korban</span><span class="stat-total" id="total-victim">dari 0 total</span></div></div></div><div class="panel legend"><h3>Legenda</h3><div><b style="background:var(--blue)"></b> PLTA</div><div><b style="background:var(--orange)"></b> Lubang Tambang</div><div><b style="background:var(--red)"></b> Korban Tambang</div><div style="color:var(--muted);font-size:11px;margin-top:12px"><i class="fa-solid fa-circle-info"></i> Lingkaran korban adalah radius analisis ilustratif, bukan batas regulasi.</div></div><div class="panel table-sheet"><h3>Data titik yang tampil</h3><div id="data-list"></div></div></section><aside class="panel detail" id="detail" tabindex="-1" aria-label="Detail titik"><div class="detail-empty"><i class="fa-solid fa-location-dot"></i><b>Pilih titik pada peta</b><span>Informasi, cerita, sumber, dan foto lapangan akan tampil di sini.</span></div></aside></main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
+// Configure only the published CSV URL for the Terverifikasi sheet.
+const CSV_URL='./draft-data.csv';
+// Pratinjau tampilan Beranda: konten FIKTIF berlabel "Contoh", terpisah dari data/peta. WAJIB false sebelum publikasi.
+const DEMO_HOME = true;
+const DEMO_COUNTS = {plta: 8, void: 24, victim: 5};
+const cfg = {
+  plta: {label: 'PLTA', color: '#2387ff', icon: 'fa-water'},
+  void: {label: 'Lubang Tambang', color: '#ff9448', icon: 'fa-helmet-safety'},
+  victim: {label: 'Korban Tambang', color: '#ff525f', icon: 'fa-person'}
+};
+const map = L.map('map', {zoomControl: false}).setView([-0.5, 117.15], 7);
+L.control.zoom({position: 'topright'}).addTo(map);
+const base = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+}).addTo(map);
+const layers = Object.fromEntries(Object.keys(cfg).map(k => [k, L.layerGroup().addTo(map)]));
+// Category checkboxes are the only visibility control; no competing layer switcher.
+let allData = [], active = null, dataStatus = 'loading';
+let yearRange = {min: 2000, max: new Date().getFullYear()};
+let filterState = {};
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function safeDataUrl(value) {
+  const text = String(value ?? '').trim();
+  if (/^\.\/[A-Za-z0-9._/-]+$/.test(text) && !text.includes('..')) return text;
+  return safeUrl(text);
+}
+function safeUrl(value) {
+  const text = String(value ?? '').trim();
+  try {
+    const url = new URL(text);
+    return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password ? esc(url.href) : '';
+  } catch { return ''; }
+}
+function notice(message, canReset = false) {
+  const el = document.querySelector('#notice');
+  el.textContent = message;
+  el.classList[message ? 'add' : 'remove']('show');
+  document.querySelector('#clear-filters').hidden = !canReset;
+}
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = '', quoted = false, closed = false;
+  const push = () => {row.push(field); field = ''; closed = false;};
+  text = String(text).replace(/^\uFEFF/, '');
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') {field += '"'; i++;}
+      else if (c === '"') {quoted = false; closed = true;}
+      else field += c;
+    } else if (c === ',') push();
+    else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++;
+      push(); rows.push(row); row = [];
+    } else if (c === '"' && field === '' && !closed) quoted = true;
+    else {
+      if (closed || c === '"') throw Error('CSV_SYNTAX');
+      field += c;
+    }
+  }
+  if (quoted) throw Error('CSV_SYNTAX');
+  if (field || row.length || closed) {push(); rows.push(row);}
+  return rows.filter(r => r.some(value => value.trim() !== ''));
+}
+function objects(text) {
+  const rows = parseCSV(text);
+  const header = (rows.shift() || []).map(x => x.trim());
+  const required = ['id', 'kategori', 'nama', 'lat', 'lng', 'cerita'];
+  if (required.some(k => !header.includes(k)) || new Set(header).size !== header.length) throw Error('CSV_HEADER');
+  return rows.map((cells, i) => ({
+    ...Object.fromEntries(header.map((h, j) => [h, (cells[j] || '').trim()])),
+    __row: i + 2, __invalid: cells.length !== header.length
+  }));
+}
+function icon(category) {
+  return L.divIcon({className: '', html: `<div class="marker" style="background:${cfg[category].color}"><i class="fa-solid ${cfg[category].icon}"></i></div>`,
+    iconSize: [33,33], iconAnchor: [16,16], popupAnchor: [0,-17]});
+}
+function add(input) {
+  const item = {...input};
+  const reject = reason => {console.warn('Baris dilewati', item.__row ?? item.id ?? '?', reason); return false;};
+  if (item.__invalid) return reject('Jumlah kolom tidak sesuai');
+  if (!Object.hasOwn(cfg, item.kategori)) return reject('Kategori tidak valid');
+  if (!String(item.id ?? '').trim() || !String(item.nama ?? '').trim()) return reject('ID/nama kosong');
+  if (allData.some(x => x.id === item.id)) return reject('ID duplikat');
+  const decimal = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/;
+  for (const key of ['lat', 'lng']) {
+    const value = String(item[key] ?? '').trim();
+    if (!value || !decimal.test(value)) return reject('Koordinat kosong/bukan desimal');
+    item[key] = Number(value);
+    if (!Number.isFinite(item[key]) || Math.abs(item[key]) > (key === 'lat' ? 90 : 180)) return reject('Koordinat di luar rentang');
+  }
+  const years = String(item.tanggal ?? '').match(/\b[1-9]\d{3}\b/g) || [];
+  item.year = years.length === 1 ? Number(years[0]) : null;
+  for (const key of ['sumber', 'foto_url']) {
+    if (item[key] && !safeUrl(item[key])) console.warn('URL tidak valid', item.__row ?? item.id, key);
+  }
+  if (/drive\.google\.com\/file\/d\//i.test(item.foto_url || '')) console.warn('Gunakan tautan gambar langsung', item.__row ?? item.id);
+  const marker = L.marker([item.lat, item.lng], {icon: icon(item.kategori)})
+    .addTo(layers[item.kategori]).bindTooltip(esc(item.nama), {direction: 'top'});
+  marker.on('click', () => select(item));
+  item.marker = marker;
+  if (item.kategori === 'victim') item.radius = L.circle([item.lat, item.lng], {
+    radius: 300, color: cfg.victim.color, fillOpacity: .08, weight: 1, interactive: false
+  }).addTo(layers.victim);
+  allData.push(item);
+  return true;
+}
+function readFilters() {
+  filterState = {
+    categories: [...document.querySelectorAll('[data-category]:checked')].map(x => x.dataset.category),
+    query: document.querySelector('#search').value.trim().toLowerCase(),
+    location: document.querySelector('#location').value,
+    year: Number(document.querySelector('#year').value)
+  };
+  return filterState;
+}
+function matchesOtherFilters(item, state) {
+  return (!state.query || [item.nama,item.cerita,item.lokasi,item.perusahaan].join(' ').toLowerCase().includes(state.query)) &&
+    (!state.location || (state.location === '__unknown' ? !item.lokasi : item.lokasi === state.location)) &&
+    (item.year === null || item.year <= state.year);
+}
+function filtered() {
+  const state = readFilters();
+  return allData.filter(x => state.categories.includes(x.kategori) && matchesOtherFilters(x, state));
+}
+function select(value) {
+  const item = typeof value === 'string' ? allData.find(x => x.id === value) : value;
+  if (!item || !allData.includes(item)) return;
+  const state = readFilters();
+  if (!matchesOtherFilters(item, state)) {
+    notice('Titik ini tersembunyi oleh filter. Gunakan Hapus filter untuk menampilkannya.', true);
+    return;
+  }
+  document.querySelectorAll('[data-category]').forEach(x => {
+    if (x.dataset.category === item.kategori) x.checked = true;
+  });
+  apply();
+  active = item;
+  map.flyTo([item.lat,item.lng], Math.max(map.getZoom(),13), {duration:.65});
+  renderDetail();
+  if (typeof window !== 'undefined' && window.matchMedia('(max-width:900px)').matches) {
+    const detail = document.querySelector('#detail');
+    detail.focus({preventScroll: true});
+    detail.scrollIntoView({block: 'start', behavior: 'instant'});
+  }
+}
+function renderDetail() {
+  const el = document.querySelector('#detail');
+  if (!active) {
+    el.innerHTML = '<div class="detail-empty"><i class="fa-solid fa-location-dot"></i><b>Pilih titik pada peta</b><span>Informasi, cerita, sumber, dan foto lapangan akan tampil di sini.</span></div>';
+    return;
+  }
+  const item = active, category = cfg[item.kategori], photo = safeUrl(item.foto_url);
+  const fields = item.kategori === 'plta' ? [['Kapasitas',item.kapasitas]] : item.kategori === 'void' ?
+    [['Luas',item.luas],['Kedalaman',item.kedalaman],['Status',item.status],['Perusahaan',item.perusahaan]] :
+    [['Perusahaan',item.perusahaan],['Tanggal',item.tanggal]];
+  el.innerHTML = `<span class="badge ${item.kategori}">${category.label}</span><h1>${esc(item.nama)}</h1><p class="sub">${esc(item.lokasi || 'Lokasi belum diisi')}</p>${photo ? `<img class="photo" src="${photo}" alt="Foto: ${esc(item.nama)}" loading="lazy">` : '<div class="no-photo">Foto lapangan belum tersedia</div>'}<div class="info-grid"><div class="info"><label>Koordinat (lat, lng)</label>${item.lat.toFixed(5)}, ${item.lng.toFixed(5)}</div>${fields.map(([name,value]) => `<div class="info"><label>${name}</label>${esc(value || 'Belum diisi')}</div>`).join('')}</div><h3>Cerita / kronologi</h3><p class="story">${esc(item.cerita || 'Belum ada cerita.')}</p>${safeUrl(item.sumber) ? `<a class="source" href="${safeUrl(item.sumber)}" target="_blank" rel="noopener noreferrer">Buka sumber data</a>` : '<p class="sub">Sumber belum tersedia.</p>'}`;
+  const image = el.querySelector ? el.querySelector('.photo') : null;
+  if (image) image.onerror = () => {image.replaceWith(Object.assign(document.createElement('div'), {className:'no-photo', textContent:'Foto tidak dapat dimuat'}));};
+}
+function apply() {
+  const rows = filtered(), visible = new Set(rows.map(x => x.id));
+  Object.entries(layers).forEach(([category, group]) => {
+    group.clearLayers();
+    if (filterState.categories.includes(category)) map.addLayer(group);
+    else map.removeLayer(group);
+  });
+  rows.forEach(item => {
+    item.marker.addTo(layers[item.kategori]);
+    if (item.radius) item.radius.addTo(layers[item.kategori]);
+  });
+  if (active && !visible.has(active.id)) {active = null; renderDetail();}
+  if (dataStatus === 'ready') notice('');
+  stats(rows);
+  renderList(rows);
+}
+function renderList(rows = filtered()) {
+  const list = document.querySelector('#data-list');
+  list.innerHTML = rows.length ? rows.map(x => `<button type="button" class="data-row" data-id="${esc(x.id)}"><i class="fa-solid ${cfg[x.kategori].icon}" style="color:${cfg[x.kategori].color}"></i><b>${esc(x.nama)}</b><span>${esc(x.lokasi || '')}</span></button>`).join('') :
+    `<p>${dataStatus === 'loading' ? 'Memuat data…' : dataStatus === 'error' ? 'Data tidak dapat dimuat.' : dataStatus === 'invalid' ? 'Data bermasalah. Hubungi pengelola situs.' : allData.length ? 'Tidak ada titik yang cocok. Gunakan Reset filter.' : 'Belum ada data terverifikasi.'}</p>`;
+  document.querySelectorAll('.data-row[data-id]').forEach(el => {el.onclick = () => select(el.dataset.id);});
+}
+function renderHome() {
+  for (const category of Object.keys(cfg)) {
+    const demo = DEMO_HOME && dataStatus !== 'ready';
+    document.querySelector(`#home-${category}`).textContent = dataStatus === 'ready' ? String(allData.filter(x => x.kategori === category).length) : demo ? String(DEMO_COUNTS[category]) : '–';
+  }
+  document.querySelector('#home-demo').hidden = !DEMO_HOME;
+  document.querySelectorAll('[data-demo]').forEach(x => {x.hidden = !DEMO_HOME;});
+  document.querySelector('#home-note').textContent = DEMO_HOME && dataStatus !== 'ready' ? 'CONTOH: angka di atas fiktif untuk pratinjau tampilan, bukan data sebenarnya.' : dataStatus === 'loading' ? 'Memuat data…' :
+    dataStatus !== 'ready' ? 'Jumlah titik belum tersedia karena data belum dapat dimuat.' :
+    allData.length ? 'Jumlah titik dari data simulasi pratinjau, bukan data nyata.' : 'Belum ada data terverifikasi.';
+}
+function stats(rows = allData) {
+  renderHome();
+  for (const category of Object.keys(cfg)) {
+    const count = rows.filter(x => x.kategori === category).length;
+    document.querySelector(`#stat-${category}`).textContent = dataStatus === 'loading' ? '…' : String(count);
+    document.querySelector(`#count-${category}`).textContent = String(count);
+    const total = allData.filter(x => x.kategori === category).length;
+    document.querySelector(`#stat-${category}`).title = `Dari ${total} total`;
+    document.querySelector(`#total-${category}`).textContent = `dari ${total} total`;
+  }
+  const unknown = rows.filter(x => x.year === null).length;
+  document.querySelector('#unknown-years').textContent = unknown ? `Termasuk ${unknown} titik tanpa tahun diketahui.` : '';
+}
+function setupFilters() {
+  const locations = [...new Set(allData.map(x => x.lokasi).filter(Boolean))].sort();
+  document.querySelector('#location').innerHTML = '<option value="">Semua lokasi</option>' + locations.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('') + (allData.some(x => !x.lokasi) ? '<option value="__unknown">Wilayah tidak diisi</option>' : '');
+  const years = allData.map(x => x.year).filter(x => x !== null);
+  yearRange = {min: years.length ? Math.min(...years) : 2000, max: years.length ? Math.max(...years) : new Date().getFullYear()};
+  const slider = document.querySelector('#year');
+  slider.min = yearRange.min; slider.max = yearRange.max; slider.value = yearRange.max;
+  document.querySelector('#year-min').textContent = yearRange.min;
+  document.querySelector('#year-value').textContent = 'Sampai ' + yearRange.max;
+}
+function resetFilters() {
+  document.querySelector('#search').value = '';
+  document.querySelector('#location').value = '';
+  document.querySelector('#year').value = yearRange.max;
+  document.querySelector('#year-value').textContent = 'Sampai ' + yearRange.max;
+  document.querySelectorAll('[data-category]').forEach(x => {x.checked = true;});
+  notice(''); apply();
+}
+async function load() {
+  dataStatus = 'loading'; stats([]); renderList([]); notice('Memuat data…');
+  if (!CSV_URL || CSV_URL.includes('REPLACE_WITH') || !safeDataUrl(CSV_URL)) {
+    dataStatus = 'error'; stats([]); renderList([]);
+    notice('Data tidak dapat dimuat. URL CSV Terverifikasi belum dikonfigurasi.');
+    return;
+  }
+  let records;
+  try {
+    const response = await fetch(CSV_URL);
+    if (!response.ok) throw Error('HTTP');
+    records = objects(await response.text());
+  } catch (error) {
+    dataStatus = 'error'; stats([]); renderList([]);
+    console.warn('Pemuatan CSV gagal', error.message);
+    notice('Data tidak dapat dimuat, coba muat ulang halaman.');
+    return;
+  }
+  try {
+    allData = []; active = null;
+    Object.values(layers).forEach(group => group.clearLayers());
+    let skipped = 0;
+    records.forEach(item => {if (!add(item)) skipped++;});
+    console.warn(`${allData.length} dimuat, ${skipped} dilewati`);
+    dataStatus = records.length && !allData.length ? 'invalid' : 'ready';
+    setupFilters(); apply(); renderDetail();
+    if (dataStatus === 'invalid') notice('Data ditemukan tetapi tidak ada baris yang lolos pemeriksaan; hubungi pengelola situs.');
+    else if (!records.length) notice('Belum ada data terverifikasi.');
+  } catch (error) {
+    dataStatus = 'error';
+    allData = []; active = null;
+    Object.values(layers).forEach(group => group.clearLayers());
+    stats([]); renderList([]); renderDetail();
+    console.warn('Render data gagal', error.message);
+    notice('Tampilan data gagal diproses. Hubungi pengelola situs.');
+  }
+}
+document.querySelector('#apply').onclick = apply;
+document.querySelector('#search').oninput = () => {if (view !== 'map') go('map'); apply();};
+document.querySelector('#location').onchange = apply;
+document.querySelector('#year').oninput = e => {document.querySelector('#year-value').textContent = 'Sampai ' + e.target.value; apply();};
+document.querySelectorAll('[data-category]').forEach(x => {x.onchange = apply;});
+document.querySelector('#reset').onclick = resetFilters;
+document.querySelector('#clear-filters').onclick = resetFilters;
+// Beranda adalah halaman pertama; #/peta membuka peta langsung.
+let view = 'home';
+function showView(next) {
+  view = next;
+  const body = document.querySelector('body');
+  body.classList[next === 'home' ? 'add' : 'remove']('view-home');
+  body.classList[next === 'method' ? 'add' : 'remove']('view-method');
+  document.querySelectorAll('[data-view]').forEach(x => x.classList[x.dataset.view === next ? 'add' : 'remove']('active'));
+  if (next === 'map') setTimeout(() => map.invalidateSize?.(), 0);
+}
+const ROUTES = {'#/peta': 'map', '#/metodologi': 'method'};
+function route() { showView(ROUTES[globalThis.location?.hash] || 'home'); }
+function go(next) {
+  if (globalThis.location) globalThis.location.hash = {map: '#/peta', method: '#/metodologi'}[next] || '#/beranda';
+  else showView(next);
+}
+function focusCategory(category) {
+  document.querySelectorAll('[data-category]').forEach(x => {x.checked = x.dataset.category === category;});
+  go('map'); apply();
+}
+document.querySelectorAll('[data-go]').forEach(x => {x.onclick = () => go(x.dataset.go);});
+document.querySelectorAll('[data-focus]').forEach(x => {x.onclick = () => focusCategory(x.dataset.focus);});
+globalThis.addEventListener?.('hashchange', route);
+route();
+load();
+</script></body></html>
