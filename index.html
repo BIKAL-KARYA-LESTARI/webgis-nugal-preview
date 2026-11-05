@@ -57,9 +57,10 @@
 </div></section>
 <section id="story" class="home" aria-label="Cerita"><div class="home-inner">
 <div class="hero" style="display:block;padding:44px 0 8px"><span class="eyebrow">Cerita</span><h1>Cerita dari tapak</h1><p class="lead">Cerita bergambar dari tiap lokasi, disusun dari titik yang sudah diperiksa.</p></div>
-<div class="sec-head" style="margin-top:0"><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="tag-filter active" data-story-filter="">Semua</button><button type="button" class="tag-filter" data-story-filter="plta">PLTA</button><button type="button" class="tag-filter" data-story-filter="void">Lubang Tambang</button><button type="button" class="tag-filter" data-story-filter="victim">Korban Tambang</button></div></div>
+<div class="sec-head" id="story-filter-bar" style="margin-top:0"><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="tag-filter active" data-story-filter="">Semua</button><button type="button" class="tag-filter" data-story-filter="plta">PLTA</button><button type="button" class="tag-filter" data-story-filter="void">Lubang Tambang</button><button type="button" class="tag-filter" data-story-filter="victim">Korban Tambang</button></div></div>
 <div class="stories" id="story-grid"></div>
 <p class="home-note" id="story-note"></p>
+<div id="story-detail" hidden></div>
 </div></section>
 <section id="data" class="home" aria-label="Data"><div class="home-inner">
 <div class="hero" style="display:block;padding:44px 0 8px"><span class="eyebrow">Data</span><h1>Seluruh titik data</h1><p class="lead">Daftar semua titik yang sudah diperiksa. Cari lalu buka langsung di peta.</p></div>
@@ -98,6 +99,7 @@ const layers = Object.fromEntries(Object.keys(cfg).map(k => [k, L.layerGroup().a
 // Category checkboxes are the only visibility control; no competing layer switcher.
 let allData = [], active = null, dataStatus = 'loading';
 let storyFilter = '';
+let storyDetailId = null;
 let dataFilter = '';
 let yearRange = {min: 2000, max: new Date().getFullYear()};
 let filterState = {};
@@ -293,15 +295,42 @@ function storyCardHtml(item, isDemo) {
   const photo = !isDemo ? photoUrl(item.foto_url) : '';
   const thumb = photo ? `<div class="ph ph-${item.kategori}" style="background-image:url('${photo}');background-size:cover;background-position:center"></div>` :
     `<div class="ph ph-${item.kategori}" role="img" aria-label="Gambar"><i class="fa-solid fa-image"></i>${isDemo ? 'Gambar contoh' : 'Belum ada foto'}</div>`;
-  const text = String(item.cerita || '');
-  const excerpt = text ? esc(text.slice(0, 110)) + (text.length > 110 ? '…' : '') : 'Cerita belum ditulis.';
+  const text = String(item.cerita || '').trim();
+  const excerpt = text ? esc(text.slice(0, 110)) + (text.length > 110 ? '…' : '') : '- Cerita akan diupdate -';
   const body = `<div class="story-body"><span class="tag ${item.kategori}">${category.label}</span><h3>${esc(item.nama)}</h3><p>${excerpt}</p><span class="meta">${esc(item.lokasi || 'Lokasi belum diisi')}${isDemo ? ' <span class="demo-flag">Contoh</span>' : ''}</span></div>`;
   return isDemo ? `<article class="story-card">${thumb}${body}</article>` :
     `<button type="button" class="story-card" style="text-align:left;padding:0;width:100%;cursor:pointer;display:block" data-story-id="${esc(item.id)}">${thumb}${body}</button>`;
 }
+function storyDetailHtml(item) {
+  const category = cfg[item.kategori];
+  const photo = photoUrl(item.foto_url);
+  const text = String(item.cerita || '').trim() || '- Cerita akan diupdate -';
+  return `<button type="button" id="story-back" class="ghost" style="margin-bottom:20px"><i class="fa-solid fa-arrow-left"></i> Kembali ke daftar cerita</button>
+<article style="max-width:720px">
+<span class="badge ${item.kategori}">${category.label}</span>
+<h1 style="margin:12px 0 4px">${esc(item.nama)}</h1>
+<p class="sub">${esc(item.lokasi || 'Lokasi belum diisi')}</p>
+${photo ? `<img class="photo" style="width:100%;height:auto;max-height:420px;margin:14px 0" src="${photo}" alt="Foto: ${esc(item.nama)}" loading="lazy">` : ''}
+<p class="story" style="white-space:pre-line">${esc(text)}</p>
+${safeUrl(item.sumber) ? `<a class="source" href="${safeUrl(item.sumber)}" target="_blank" rel="noopener noreferrer">Buka sumber data</a>` : '<p class="sub">Sumber belum tersedia.</p>'}
+</article>`;
+}
 function renderStory() {
   const grid = document.querySelector('#story-grid'), note = document.querySelector('#story-note');
+  const filterBar = document.querySelector('#story-filter-bar'), detailWrap = document.querySelector('#story-detail');
   if (!grid) return;
+  if (storyDetailId) {
+    const item = allData.find(x => x.id === storyDetailId);
+    if (item) {
+      grid.style.display = 'none'; note.style.display = 'none'; filterBar.style.display = 'none';
+      detailWrap.hidden = false;
+      detailWrap.innerHTML = storyDetailHtml(item);
+      document.querySelector('#story-back').onclick = () => {storyDetailId = null; renderStory();};
+      return;
+    }
+    storyDetailId = null;
+  }
+  grid.style.display = ''; note.style.display = ''; filterBar.style.display = ''; detailWrap.hidden = true;
   const demo = DEMO_HOME && dataStatus !== 'ready';
   if (demo) {
     const rows = DEMO_STORIES.filter(x => !storyFilter || x.kategori === storyFilter);
@@ -313,7 +342,7 @@ function renderStory() {
   grid.innerHTML = rows.length ? rows.map(x => storyCardHtml(x, false)).join('') :
     `<p>${dataStatus === 'loading' ? 'Memuat data…' : dataStatus === 'error' ? 'Data tidak dapat dimuat.' : dataStatus === 'invalid' ? 'Data bermasalah. Hubungi pengelola situs.' : 'Belum ada cerita terverifikasi.'}</p>`;
   note.textContent = dataStatus === 'ready' ? `Menampilkan ${rows.length} cerita dari data terverifikasi.` : '';
-  document.querySelectorAll('[data-story-id]').forEach(el => {el.onclick = () => {select(el.dataset.storyId); go('map');};});
+  document.querySelectorAll('[data-story-id]').forEach(el => {el.onclick = () => {storyDetailId = el.dataset.storyId; renderStory();};});
 }
 function dataRowHtml(item, isDemo, first) {
   const category = cfg[item.kategori];
@@ -454,7 +483,7 @@ function focusCategory(category) {
   document.querySelectorAll('[data-category]').forEach(x => {x.checked = x.dataset.category === category;});
   go('map'); apply();
 }
-document.querySelectorAll('[data-go]').forEach(x => {x.onclick = () => go(x.dataset.go);});
+document.querySelectorAll('[data-go]').forEach(x => {x.onclick = () => {if (x.dataset.go === 'story') storyDetailId = null; go(x.dataset.go);};});
 document.querySelectorAll('[data-focus]').forEach(x => {x.onclick = () => focusCategory(x.dataset.focus);});
 document.querySelectorAll('[data-story-filter]').forEach(btn => {
   btn.onclick = () => {
