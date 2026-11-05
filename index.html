@@ -70,7 +70,12 @@
 <main class="app"><aside class="panel filter"><div class="section-head"><h2>Filter Peta</h2><button class="reset" id="reset">Reset <i class="fa-solid fa-rotate-left"></i></button></div><h3>Pilih Isu Utama</h3><label class="check-row"><input type="checkbox" data-category="plta" checked><span class="icon-dot plta"><i class="fa-solid fa-water"></i></span>PLTA <b id="count-plta"></b></label><label class="check-row"><input type="checkbox" data-category="void" checked><span class="icon-dot void"><i class="fa-solid fa-helmet-safety"></i></span>Lubang Tambang <b id="count-void"></b></label><label class="check-row"><input type="checkbox" data-category="victim" checked><span class="icon-dot victim"><i class="fa-solid fa-person"></i></span>Korban <b id="count-victim"></b></label><h3>Lokasi dari data</h3><select id="location" aria-label="Lokasi"><option value="">Semua lokasi</option></select><h3>Tahun kejadian</h3><input id="year" aria-label="Sampai tahun" type="range" min="2000" max="2026" value="2026"><div class="range-label"><span id="year-min">2000</span><span id="year-value">Sampai 2026</span></div><p id="unknown-years" class="sub" aria-live="polite"></p><button class="apply" id="apply"><i class="fa-solid fa-filter"></i> Terapkan Filter</button></aside><section class="map-area"><div id="map" class="panel map"></div><div id="notice" class="notice" role="status" aria-live="polite"></div><button id="clear-filters" class="clear-filters" hidden>Hapus filter</button><div class="stats"><div class="stat"><i class="fa-solid fa-water" style="color:var(--blue)"></i><div><strong id="stat-plta">0</strong><span>Titik PLTA</span><span class="stat-total" id="total-plta">dari 0 total</span></div></div><div class="stat"><i class="fa-solid fa-helmet-safety" style="color:var(--orange)"></i><div><strong id="stat-void">0</strong><span>Lubang tambang</span><span class="stat-total" id="total-void">dari 0 total</span></div></div><div class="stat"><i class="fa-solid fa-person" style="color:var(--red)"></i><div><strong id="stat-victim">0</strong><span>Kasus korban</span><span class="stat-total" id="total-victim">dari 0 total</span></div></div></div><div class="panel legend"><h3>Legenda</h3><div><b style="background:var(--blue)"></b> PLTA</div><div><b style="background:var(--orange)"></b> Lubang Tambang</div><div><b style="background:var(--red)"></b> Korban Tambang</div><div style="color:var(--muted);font-size:11px;margin-top:12px"><i class="fa-solid fa-circle-info"></i> Lingkaran korban adalah radius analisis ilustratif, bukan batas regulasi.</div></div><div class="panel table-sheet"><h3>Data titik yang tampil</h3><div id="data-list"></div></div></section><aside class="panel detail" id="detail" tabindex="-1" aria-label="Detail titik"><div class="detail-empty"><i class="fa-solid fa-location-dot"></i><b>Pilih titik pada peta</b><span>Informasi, cerita, sumber, dan foto lapangan akan tampil di sini.</span></div></aside></main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
 // Configure only the published CSV URL for the Terverifikasi sheet.
-const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vTVddcjeZN6WEr9RlPrExv7B6g7igzyuzkg3cVueUAa5RPVYb1pdu-oY5cZ9KN2mfTCi0ah-8A4HAOF/pub?gid=1068868295&single=true&output=csv';
+// Setiap kategori punya spreadsheet Terverifikasi sendiri (CSV publik masing-masing).
+const CSV_SOURCES = {
+  plta: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTVddcjeZN6WEr9RlPrExv7B6g7igzyuzkg3cVueUAa5RPVYb1pdu-oY5cZ9KN2mfTCi0ah-8A4HAOF/pub?gid=1068868295&single=true&output=csv',
+  void: 'REPLACE_WITH_PUBLISHED_CSV_URL_VOID',
+  victim: 'REPLACE_WITH_PUBLISHED_CSV_URL_VICTIM'
+};
 // Pratinjau tampilan Beranda: konten FIKTIF berlabel "Contoh", terpisah dari data/peta. WAJIB false sebelum publikasi.
 const DEMO_HOME = true;
 const DEMO_COUNTS = {plta: 8, void: 24, victim: 5};
@@ -355,32 +360,49 @@ function resetFilters() {
 }
 async function load() {
   dataStatus = 'loading'; stats([]); renderList([]); notice('Memuat data…');
-  if (!CSV_URL || CSV_URL.includes('REPLACE_WITH') || !safeDataUrl(CSV_URL)) {
+  const entries = Object.entries(CSV_SOURCES);
+  const configured = entries.filter(([, url]) => url && !url.includes('REPLACE_WITH') && safeDataUrl(url));
+  const unconfigured = entries.filter(([, url]) => !configured.some(([, u]) => u === url)).map(([category]) => category);
+  if (!configured.length) {
     dataStatus = 'error'; stats([]); renderList([]);
-    notice('Data tidak dapat dimuat. URL CSV Terverifikasi belum dikonfigurasi.');
+    notice('Data tidak dapat dimuat. Belum ada sumber CSV Terverifikasi yang dikonfigurasi.');
     return;
   }
-  let records;
-  try {
-    const response = await fetch(CSV_URL);
-    if (!response.ok) throw Error('HTTP');
-    records = objects(await response.text());
-  } catch (error) {
+  const results = await Promise.all(configured.map(async ([category, url]) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw Error('HTTP');
+      return {category, records: objects(await response.text())};
+    } catch (error) {
+      console.warn(`Pemuatan CSV ${category} gagal`, error.message);
+      return {category, error};
+    }
+  }));
+  const loaded = results.filter(r => !r.error);
+  const failed = results.filter(r => r.error).map(r => cfg[r.category].label);
+  const missing = unconfigured.map(category => cfg[category].label);
+  if (!loaded.length) {
     dataStatus = 'error'; stats([]); renderList([]);
-    console.warn('Pemuatan CSV gagal', error.message);
     notice('Data tidak dapat dimuat, coba muat ulang halaman.');
     return;
   }
   try {
     allData = []; active = null;
     Object.values(layers).forEach(group => group.clearLayers());
-    let skipped = 0;
-    records.forEach(item => {if (!add(item)) skipped++;});
+    let skipped = 0, totalRecords = 0;
+    loaded.forEach(({records}) => {
+      totalRecords += records.length;
+      records.forEach(item => {if (!add(item)) skipped++;});
+    });
     console.warn(`${allData.length} dimuat, ${skipped} dilewati`);
-    dataStatus = records.length && !allData.length ? 'invalid' : 'ready';
+    dataStatus = totalRecords && !allData.length ? 'invalid' : 'ready';
     setupFilters(); apply(); renderDetail();
-    if (dataStatus === 'invalid') notice('Data ditemukan tetapi tidak ada baris yang lolos pemeriksaan; hubungi pengelola situs.');
-    else if (!records.length) notice('Belum ada data terverifikasi.');
+    const notes = [];
+    if (dataStatus === 'invalid') notes.push('Data ditemukan tetapi tidak ada baris yang lolos pemeriksaan; hubungi pengelola situs.');
+    else if (!totalRecords) notes.push('Belum ada data terverifikasi.');
+    if (failed.length) notes.push(`Gagal memuat: ${failed.join(', ')}.`);
+    if (missing.length) notes.push(`Belum dikonfigurasi: ${missing.join(', ')}.`);
+    notice(notes.join(' '));
   } catch (error) {
     dataStatus = 'error';
     allData = []; active = null;
