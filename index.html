@@ -125,7 +125,7 @@ function photoUrl(value) {
   const url = safeUrl(value);
   if (!url) return '';
   const driveShare = url.match(/^https:\/\/drive\.google\.com\/file\/d\/([^/]+)\//i);
-  return driveShare ? `https://drive.google.com/uc?export=view&amp;id=${driveShare[1]}` : url;
+  return driveShare ? `assets/photo-proxy.php?id=${driveShare[1]}` : url;
 }
 function notice(message, canReset = false) {
   const el = document.querySelector('#notice');
