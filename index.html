@@ -63,6 +63,7 @@
 </div></section>
 <section id="data" class="home" aria-label="Data"><div class="home-inner">
 <div class="hero" style="display:block;padding:44px 0 8px"><span class="eyebrow">Data</span><h1>Seluruh titik data</h1><p class="lead">Daftar semua titik yang sudah diperiksa. Cari lalu buka langsung di peta.</p></div>
+<div class="sec-head" style="margin-top:0"><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="tag-filter active" data-list-filter="">Semua</button><button type="button" class="tag-filter" data-list-filter="plta">PLTA</button><button type="button" class="tag-filter" data-list-filter="void">Lubang Tambang</button><button type="button" class="tag-filter" data-list-filter="victim">Korban Tambang</button></div></div>
 <label class="search" style="margin:0 0 16px;width:min(420px,100%)"><i class="fa-solid fa-magnifying-glass"></i><input id="data-search" aria-label="Cari di data" placeholder="Cari nama, lokasi, atau perusahaan..."></label>
 <div class="recent" id="data-table"></div>
 <p class="home-note" id="data-note"></p>
@@ -97,6 +98,7 @@ const layers = Object.fromEntries(Object.keys(cfg).map(k => [k, L.layerGroup().a
 // Category checkboxes are the only visibility control; no competing layer switcher.
 let allData = [], active = null, dataStatus = 'loading';
 let storyFilter = '';
+let dataFilter = '';
 let yearRange = {min: 2000, max: new Date().getFullYear()};
 let filterState = {};
 function esc(value) {
@@ -107,12 +109,23 @@ function safeDataUrl(value) {
   if (/^\.\/[A-Za-z0-9._/-]+$/.test(text) && !text.includes('..')) return text;
   return safeUrl(text);
 }
+function displayName(item) {
+  if (item.kategori !== 'victim') return item.nama;
+  const num = parseInt(String(item.id).match(/(\d+)$/)?.[0] || '', 10);
+  return Number.isFinite(num) ? `Korban #${num} — ${item.nama}` : item.nama;
+}
 function safeUrl(value) {
   const text = String(value ?? '').trim();
   try {
     const url = new URL(text);
     return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password ? esc(url.href) : '';
   } catch { return ''; }
+}
+function photoUrl(value) {
+  const url = safeUrl(value);
+  if (!url) return '';
+  const driveShare = url.match(/^https:\/\/drive\.google\.com\/file\/d\/([^/]+)\//i);
+  return driveShare ? `https://drive.google.com/uc?export=view&amp;id=${driveShare[1]}` : url;
 }
 function notice(message, canReset = false) {
   const el = document.querySelector('#notice');
@@ -180,7 +193,7 @@ function add(input) {
   }
   if (/drive\.google\.com\/file\/d\//i.test(item.foto_url || '')) console.warn('Gunakan tautan gambar langsung', item.__row ?? item.id);
   const marker = L.marker([item.lat, item.lng], {icon: icon(item.kategori)})
-    .addTo(layers[item.kategori]).bindTooltip(esc(item.nama), {direction: 'top'});
+    .addTo(layers[item.kategori]).bindTooltip(esc(displayName(item)), {direction: 'top'});
   marker.on('click', () => select(item));
   item.marker = marker;
   if (item.kategori === 'victim') item.radius = L.circle([item.lat, item.lng], {
@@ -234,11 +247,11 @@ function renderDetail() {
     el.innerHTML = '<div class="detail-empty"><i class="fa-solid fa-location-dot"></i><b>Pilih titik pada peta</b><span>Informasi, cerita, sumber, dan foto lapangan akan tampil di sini.</span></div>';
     return;
   }
-  const item = active, category = cfg[item.kategori], photo = safeUrl(item.foto_url);
+  const item = active, category = cfg[item.kategori], photo = photoUrl(item.foto_url);
   const fields = item.kategori === 'plta' ? [['Kapasitas',item.kapasitas]] : item.kategori === 'void' ?
     [['Luas',item.luas],['Kedalaman',item.kedalaman],['Status',item.status],['Perusahaan',item.perusahaan]] :
     [['Perusahaan',item.perusahaan],['Tanggal',item.tanggal]];
-  el.innerHTML = `<span class="badge ${item.kategori}">${category.label}</span><h1>${esc(item.nama)}</h1><p class="sub">${esc(item.lokasi || 'Lokasi belum diisi')}</p>${photo ? `<img class="photo" src="${photo}" alt="Foto: ${esc(item.nama)}" loading="lazy">` : '<div class="no-photo">Foto lapangan belum tersedia</div>'}<div class="info-grid"><div class="info"><label>Koordinat (lat, lng)</label>${item.lat.toFixed(5)}, ${item.lng.toFixed(5)}</div>${fields.map(([name,value]) => `<div class="info"><label>${name}</label>${esc(value || 'Belum diisi')}</div>`).join('')}</div><h3>Cerita / kronologi</h3><p class="story">${esc(item.cerita || 'Belum ada cerita.')}</p>${safeUrl(item.sumber) ? `<a class="source" href="${safeUrl(item.sumber)}" target="_blank" rel="noopener noreferrer">Buka sumber data</a>` : '<p class="sub">Sumber belum tersedia.</p>'}`;
+  el.innerHTML = `<span class="badge ${item.kategori}">${category.label}</span><h1>${esc(displayName(item))}</h1><p class="sub">${esc(item.lokasi || 'Lokasi belum diisi')}</p>${photo ? `<img class="photo" src="${photo}" alt="Foto: ${esc(displayName(item))}" loading="lazy">` : '<div class="no-photo">Foto lapangan belum tersedia</div>'}<div class="info-grid"><div class="info"><label>Koordinat (lat, lng)</label>${item.lat.toFixed(5)}, ${item.lng.toFixed(5)}</div>${fields.map(([name,value]) => `<div class="info"><label>${name}</label>${esc(value || 'Belum diisi')}</div>`).join('')}</div><h3>Cerita / kronologi</h3><p class="story">${esc(item.cerita || 'Belum ada cerita.')}</p>${safeUrl(item.sumber) ? `<a class="source" href="${safeUrl(item.sumber)}" target="_blank" rel="noopener noreferrer">Buka sumber data</a>` : '<p class="sub">Sumber belum tersedia.</p>'}`;
   const image = el.querySelector ? el.querySelector('.photo') : null;
   if (image) image.onerror = () => {image.replaceWith(Object.assign(document.createElement('div'), {className:'no-photo', textContent:'Foto tidak dapat dimuat'}));};
 }
@@ -277,7 +290,7 @@ function renderHome() {
 }
 function storyCardHtml(item, isDemo) {
   const category = cfg[item.kategori];
-  const photo = !isDemo ? safeUrl(item.foto_url) : '';
+  const photo = !isDemo ? photoUrl(item.foto_url) : '';
   const thumb = photo ? `<div class="ph ph-${item.kategori}" style="background-image:url('${photo}');background-size:cover;background-position:center"></div>` :
     `<div class="ph ph-${item.kategori}" role="img" aria-label="Gambar"><i class="fa-solid fa-image"></i>${isDemo ? 'Gambar contoh' : 'Belum ada foto'}</div>`;
   const text = String(item.cerita || '');
@@ -305,7 +318,7 @@ function renderStory() {
 function dataRowHtml(item, isDemo, first) {
   const category = cfg[item.kategori];
   const sourceOk = !isDemo && safeUrl(item.sumber);
-  const inner = `<span class="icon-dot ${item.kategori}"><i class="fa-solid ${category.icon}"></i></span><div><b>${esc(item.nama)}</b><br><span style="color:var(--muted);font-size:12px">${esc(item.lokasi || 'Lokasi belum diisi')}</span></div><span>${isDemo ? 'Contoh' : sourceOk ? 'Sumber tersedia' : 'Sumber belum ada'}</span>`;
+  const inner = `<span class="icon-dot ${item.kategori}"><i class="fa-solid ${category.icon}"></i></span><div><b>${esc(displayName(item))}</b><br><span style="color:var(--muted);font-size:12px">${esc(item.lokasi || 'Lokasi belum diisi')}</span></div><span>${isDemo ? 'Contoh' : sourceOk ? 'Sumber tersedia' : 'Sumber belum ada'}</span>`;
   if (isDemo) return `<div class="recent-row">${inner}</div>`;
   const border = first ? 'border-top:0' : 'border-top:1px solid #1d3647';
   return `<button type="button" style="all:unset;display:grid;grid-template-columns:28px 1fr auto;gap:14px;align-items:center;padding:12px 16px;${border};font-size:14px;width:100%;box-sizing:border-box;cursor:pointer;color:inherit;text-align:left" data-row-id="${esc(item.id)}">${inner}</button>`;
@@ -314,12 +327,13 @@ function renderDataTab() {
   const wrap = document.querySelector('#data-table'), note = document.querySelector('#data-note');
   if (!wrap) return;
   if (DEMO_HOME && dataStatus !== 'ready') {
-    wrap.innerHTML = DEMO_STORIES.map(x => dataRowHtml(x, true)).join('');
+    const demoRows = DEMO_STORIES.filter(x => !dataFilter || x.kategori === dataFilter);
+    wrap.innerHTML = demoRows.map(x => dataRowHtml(x, true)).join('');
     note.textContent = 'CONTOH: baris di atas fiktif untuk pratinjau tampilan, bukan data sebenarnya.';
     return;
   }
   const query = (document.querySelector('#data-search')?.value || '').trim().toLowerCase();
-  const rows = allData.filter(x => !query || [x.nama, x.lokasi, x.perusahaan].join(' ').toLowerCase().includes(query));
+  const rows = allData.filter(x => (!dataFilter || x.kategori === dataFilter) && (!query || [x.nama, x.lokasi, x.perusahaan].join(' ').toLowerCase().includes(query)));
   wrap.innerHTML = rows.length ? rows.map((x, i) => dataRowHtml(x, false, i === 0)).join('') :
     `<p style="padding:14px">${dataStatus === 'loading' ? 'Memuat data…' : dataStatus === 'error' ? 'Data tidak dapat dimuat.' : dataStatus === 'invalid' ? 'Data bermasalah. Hubungi pengelola situs.' : allData.length ? 'Tidak ada titik yang cocok.' : 'Belum ada data terverifikasi.'}</p>`;
   note.textContent = dataStatus === 'ready' ? `Menampilkan ${rows.length} dari ${allData.length} titik terverifikasi.` : '';
@@ -450,6 +464,13 @@ document.querySelectorAll('[data-story-filter]').forEach(btn => {
   };
 });
 document.querySelector('#data-search').oninput = renderDataTab;
+document.querySelectorAll('[data-list-filter]').forEach(btn => {
+  btn.onclick = () => {
+    dataFilter = btn.dataset.listFilter;
+    document.querySelectorAll('[data-list-filter]').forEach(b => b.classList.toggle('active', b === btn));
+    renderDataTab();
+  };
+});
 globalThis.addEventListener?.('hashchange', route);
 route();
 load();
