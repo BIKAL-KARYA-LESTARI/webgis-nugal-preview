@@ -23,21 +23,12 @@
 <button type="button" class="card" data-focus="victim"><span class="card-top"><span class="icon-dot victim"><i class="fa-solid fa-person"></i></span><b>Kasus korban</b></span><strong><span id="home-victim">–</span><small>kasus</small></strong><span class="card-desc">Catatan kasus korban tambang dan kronologinya.</span><span class="more">Lihat di peta <i class="fa-solid fa-arrow-right"></i></span></button>
 </div>
 <p class="home-note" id="home-note"></p>
-<div id="home-demo" hidden>
-<div class="demo-banner"><span class="demo-flag">Contoh</span><span>Pratinjau tampilan: angka, cerita, gambar, dan daftar di bagian ini adalah <b>contoh fiktif</b>, bukan data atau kasus nyata.</span></div>
-<div class="sec-head"><h2>Cerita pilihan <span class="demo-flag">Contoh</span></h2><button type="button" disabled title="Segera hadir">Lihat semua cerita</button></div>
-<div class="stories">
-<article class="story-card"><div class="ph ph-plta" role="img" aria-label="Gambar contoh"><i class="fa-solid fa-image"></i>Gambar contoh</div><div class="story-body"><span class="tag plta">PLTA</span><h3>Judul cerita contoh pertama</h3><p>Teks contoh untuk pratinjau tata letak. Isi sebenarnya ditulis dari sumber yang dapat diperiksa.</p><span class="meta">Tanggal contoh · Lokasi contoh A</span></div></article>
-<article class="story-card"><div class="ph ph-void" role="img" aria-label="Gambar contoh"><i class="fa-solid fa-image"></i>Gambar contoh</div><div class="story-body"><span class="tag void">TAMBANG</span><h3>Judul cerita contoh kedua</h3><p>Teks contoh untuk pratinjau tata letak. Isi sebenarnya ditulis dari sumber yang dapat diperiksa.</p><span class="meta">Tanggal contoh · Lokasi contoh B</span></div></article>
-<article class="story-card"><div class="ph ph-victim" role="img" aria-label="Gambar contoh"><i class="fa-solid fa-image"></i>Gambar contoh</div><div class="story-body"><span class="tag victim">KORBAN</span><h3>Judul cerita contoh ketiga</h3><p>Teks contoh untuk pratinjau tata letak. Isi sebenarnya ditulis dari sumber yang dapat diperiksa.</p><span class="meta">Tanggal contoh · Lokasi contoh C</span></div></article>
-</div>
-<div class="sec-head"><h2>Titik terbaru <span class="demo-flag">Contoh</span></h2><button type="button" data-go="map">Lihat semua di peta <i class="fa-solid fa-arrow-right"></i></button></div>
-<div class="recent">
-<div class="recent-row"><span class="icon-dot plta"><i class="fa-solid fa-water"></i></span><b>Titik contoh PLTA 1</b><span>Lokasi contoh A</span><span>Tanggal contoh</span></div>
-<div class="recent-row"><span class="icon-dot void"><i class="fa-solid fa-helmet-safety"></i></span><b>Titik contoh lubang tambang 2</b><span>Lokasi contoh B</span><span>Tanggal contoh</span></div>
-<div class="recent-row"><span class="icon-dot victim"><i class="fa-solid fa-person"></i></span><b>Kasus contoh 3</b><span>Lokasi contoh C</span><span>Tanggal contoh</span></div>
-<div class="recent-row"><span class="icon-dot void"><i class="fa-solid fa-helmet-safety"></i></span><b>Titik contoh lubang tambang 4</b><span>Lokasi contoh D</span><span>Tanggal contoh</span></div>
-</div>
+<div id="home-demo">
+<div class="demo-banner" id="home-demo-banner"><span class="demo-flag">Contoh</span><span>Pratinjau tampilan: angka, cerita, gambar, dan daftar di bagian ini adalah <b>contoh fiktif</b>, bukan data atau kasus nyata.</span></div>
+<div class="sec-head"><h2>Cerita pilihan <span class="demo-flag" id="home-stories-flag">Contoh</span></h2><button type="button" data-go="story">Lihat semua cerita</button></div>
+<div class="stories" id="home-stories"></div>
+<div class="sec-head"><h2>Titik terbaru <span class="demo-flag" id="home-recent-flag">Contoh</span></h2><button type="button" data-go="map">Lihat semua di peta <i class="fa-solid fa-arrow-right"></i></button></div>
+<div class="recent" id="home-recent"></div>
 </div>
 <div class="info-row"><div><h2>Kontak</h2><p><i class="fa-solid fa-location-dot"></i> Jalan Teuku Umar, Perum Bukit Indah Permai Blok H2, Sei Kunjang, Samarinda</p><p><i class="fa-solid fa-phone"></i> <a href="tel:+6285387333124">+62 853-8733-3124</a></p><p><i class="fa-solid fa-envelope"></i> <a href="mailto:nugalinstitute@nugal.id">nugalinstitute@nugal.id</a></p></div><div><h2>Link terkait</h2><p><i class="fa-solid fa-arrow-up-right-from-square"></i> <a href="https://nugal.or.id" target="_blank" rel="noopener noreferrer">nugal.or.id</a> &mdash; situs utama NUGAL INSTITUTE</p></div><div><h2>Media sosial Nugal</h2><p><i class="fa-brands fa-facebook"></i> <a href="https://www.facebook.com/share/1AomraUVf8/" target="_blank" rel="noopener noreferrer">Facebook</a></p><p><i class="fa-brands fa-instagram"></i> <a href="https://www.instagram.com/nugalista/" target="_blank" rel="noopener noreferrer">Instagram</a></p><p><i class="fa-brands fa-youtube"></i> <a href="https://www.youtube.com/@Nugalista" target="_blank" rel="noopener noreferrer">YouTube</a></p></div></div>
 </div></section>
@@ -284,11 +275,35 @@ function renderHome() {
     const demo = DEMO_HOME && dataStatus !== 'ready';
     document.querySelector(`#home-${category}`).textContent = dataStatus === 'ready' ? String(allData.filter(x => x.kategori === category).length) : demo ? String(DEMO_COUNTS[category]) : '–';
   }
-  document.querySelector('#home-demo').hidden = !DEMO_HOME;
   document.querySelectorAll('[data-demo]').forEach(x => {x.hidden = !DEMO_HOME;});
   document.querySelector('#home-note').textContent = DEMO_HOME && dataStatus !== 'ready' ? 'CONTOH: angka di atas fiktif untuk pratinjau tampilan, bukan data sebenarnya.' : dataStatus === 'loading' ? 'Memuat data…' :
     dataStatus !== 'ready' ? 'Jumlah titik belum tersedia karena data belum dapat dimuat.' :
     allData.length ? 'Jumlah titik dari data simulasi pratinjau, bukan data nyata.' : 'Belum ada data terverifikasi.';
+  renderHomeShowcase();
+}
+function recentRowHtml(item) {
+  const category = cfg[item.kategori];
+  return `<button type="button" style="all:unset;display:grid;grid-template-columns:28px 1fr auto;gap:14px;align-items:center;padding:12px 16px;border-top:1px solid #1d3647;font-size:14px;width:100%;box-sizing:border-box;cursor:pointer;color:inherit;text-align:left" data-home-id="${esc(item.id)}"><span class="icon-dot ${item.kategori}"><i class="fa-solid ${category.icon}"></i></span><b>${esc(displayName(item))}</b><span style="color:var(--muted);font-size:12px">${esc(item.lokasi || 'Lokasi belum diisi')}</span></button>`;
+}
+function renderHomeShowcase() {
+  const storiesWrap = document.querySelector('#home-stories'), recentWrap = document.querySelector('#home-recent');
+  if (!storiesWrap || !recentWrap) return;
+  const banner = document.querySelector('#home-demo-banner');
+  const storiesFlag = document.querySelector('#home-stories-flag'), recentFlag = document.querySelector('#home-recent-flag');
+  const haveReal = dataStatus === 'ready' && allData.length;
+  banner.hidden = !!haveReal; storiesFlag.hidden = !!haveReal; recentFlag.hidden = !!haveReal;
+  if (haveReal) {
+    const withStory = allData.filter(x => String(x.cerita || '').trim());
+    const picks = (withStory.length ? withStory : allData).slice(0, 3);
+    storiesWrap.innerHTML = picks.map(x => storyCardHtml(x, false)).join('');
+    document.querySelectorAll('[data-story-id]').forEach(el => {el.onclick = () => {storyDetailId = el.dataset.storyId; go('story'); renderStory();};});
+    const recentPicks = allData.slice(-4).reverse();
+    recentWrap.innerHTML = recentPicks.map(x => recentRowHtml(x)).join('');
+    document.querySelectorAll('[data-home-id]').forEach(el => {el.onclick = () => {select(el.dataset.homeId); go('map');};});
+  } else {
+    storiesWrap.innerHTML = DEMO_STORIES.map(x => storyCardHtml(x, true)).join('');
+    recentWrap.innerHTML = `<div class="recent-row"><span class="icon-dot plta"><i class="fa-solid fa-water"></i></span><b>Titik contoh PLTA 1</b><span>Lokasi contoh A</span><span>Tanggal contoh</span></div><div class="recent-row"><span class="icon-dot void"><i class="fa-solid fa-helmet-safety"></i></span><b>Titik contoh lubang tambang 2</b><span>Lokasi contoh B</span><span>Tanggal contoh</span></div><div class="recent-row"><span class="icon-dot victim"><i class="fa-solid fa-person"></i></span><b>Kasus contoh 3</b><span>Lokasi contoh C</span><span>Tanggal contoh</span></div><div class="recent-row"><span class="icon-dot void"><i class="fa-solid fa-helmet-safety"></i></span><b>Titik contoh lubang tambang 4</b><span>Lokasi contoh D</span><span>Tanggal contoh</span></div>`;
+  }
 }
 function storyCardHtml(item, isDemo) {
   const category = cfg[item.kategori];
@@ -342,7 +357,7 @@ function renderStory() {
   grid.innerHTML = rows.length ? rows.map(x => storyCardHtml(x, false)).join('') :
     `<p>${dataStatus === 'loading' ? 'Memuat data…' : dataStatus === 'error' ? 'Data tidak dapat dimuat.' : dataStatus === 'invalid' ? 'Data bermasalah. Hubungi pengelola situs.' : 'Belum ada cerita terverifikasi.'}</p>`;
   note.textContent = dataStatus === 'ready' ? `Menampilkan ${rows.length} cerita dari data terverifikasi.` : '';
-  document.querySelectorAll('[data-story-id]').forEach(el => {el.onclick = () => {storyDetailId = el.dataset.storyId; renderStory();};});
+  document.querySelectorAll('[data-story-id]').forEach(el => {el.onclick = () => {storyDetailId = el.dataset.storyId; go('story'); renderStory();};});
 }
 function dataRowHtml(item, isDemo, first) {
   const category = cfg[item.kategori];
